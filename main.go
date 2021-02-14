@@ -1,13 +1,15 @@
+//go:generate pigeon -o parser/main.go parser/grammar.peg
+//go:generate goimports -w parser/main.go
 package main
 
 import (
 	"fmt"
 	"io"
 	"os"
-	"strings"
 
 	"github.com/chzyer/readline"
 	"github.com/jacobsimpson/msh/command"
+	"github.com/jacobsimpson/msh/parser"
 )
 
 func main() {
@@ -25,7 +27,15 @@ func main() {
 			break
 		}
 
-		switch strings.TrimSpace(line) {
+		ast, err := parser.Parse("shell", []byte(line))
+		if err != nil {
+			fmt.Fprintf(os.Stderr, "Don't understand: %+v\n", err)
+			continue
+		}
+
+		program := ast.(*parser.Program)
+
+		switch program.Command.Name {
 		case "exit":
 			command.Exit()
 		case "pwd":

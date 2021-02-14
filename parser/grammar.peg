@@ -1,0 +1,28 @@
+{
+package parser
+
+type Program struct {
+    Command *Command
+}
+
+type Command struct {
+    Name string
+}
+}
+
+// Comment goes.
+program = _ command:command _ {
+    return &Program{command.(*Command)}, nil
+}
+
+command = [^ \n\t\r]+ {
+    // Without this action, the representation of this data in the resulting
+    // AST would be in the form of array of array of uint8. This single line
+    // changes the result of matching this rule to a single string.
+    return &Command{strings.TrimSpace(string(c.text))}, nil
+}
+
+// The whitespace rule is used to capture whitespace. Most grammars that I
+// build are not whitespace sensitive, so the results of matching this will
+// normally be discarded somehow.
+_ "whitespace" <- [ \n\t\r]*
