@@ -1,5 +1,11 @@
+# Build related files.
+# The project binary.
 msh
+coverage.out
 # Generated from the PEG grammar, this should never be checked in.
 parser/main.go
+
+
+# Editor backup files.
 .sw?
 .*.sw?
