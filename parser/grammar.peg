@@ -7,6 +7,7 @@ type Program struct {
 
 type Command struct {
     Name string
+    Arguments []string
 }
 }
 
@@ -15,11 +16,29 @@ program = _ command:command _ {
     return &Program{command.(*Command)}, nil
 }
 
-command = [^ \n\t\r]+ {
+command = name:name _ argument:argument? {
+    var arguments []string
+    if argument!=nil{
+        arguments = append(arguments, argument.(string))
+    }
+    return &Command{
+        Name: name.(string),
+        Arguments: arguments,
+    }, nil
+}
+
+name = [^ \n\t\r]+ {
     // Without this action, the representation of this data in the resulting
-    // AST would be in the form of array of array of uint8. This single line
+    // AST would be in the form of array of array of byte. This single line
     // changes the result of matching this rule to a single string.
-    return &Command{strings.TrimSpace(string(c.text))}, nil
+    return strings.TrimSpace(string(c.text)), nil
+}
+
+argument = [^ \n\t\r]+ {
+    // Without this action, the representation of this data in the resulting
+    // AST would be in the form of array of array of byte. This single line
+    // changes the result of matching this rule to a single string.
+    return strings.TrimSpace(string(c.text)), nil
 }
 
 // The whitespace rule is used to capture whitespace. Most grammars that I

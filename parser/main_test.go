@@ -14,14 +14,23 @@ func TestParse(t *testing.T) {
 		{
 			input: "cd",
 			want: &Program{
-				Command: &Command{"cd"},
+				Command: &Command{Name: "cd"},
 			},
 		},
 		{
 			input: `     cd
 			`,
 			want: &Program{
-				Command: &Command{"cd"},
+				Command: &Command{Name: "cd"},
+			},
+		},
+		{
+			input: ` cd /123`,
+			want: &Program{
+				Command: &Command{
+					Name:      "cd",
+					Arguments: []string{"/123"},
+				},
 			},
 		},
 	}

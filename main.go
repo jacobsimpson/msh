@@ -40,6 +40,8 @@ func main() {
 			command.Exit()
 		case "pwd":
 			command.PWD()
+		case "cd":
+			command.CD(program.Command.Arguments)
 		default:
 			fmt.Printf("You said: %q\n", line)
 		}
