@@ -43,7 +43,7 @@ func main() {
 		case "cd":
 			command.CD(program.Command.Arguments)
 		default:
-			fmt.Printf("You said: %q\n", line)
+			command.ExecuteProgram(program.Command)
 		}
 	}
 }
