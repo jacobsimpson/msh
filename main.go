@@ -4,8 +4,10 @@ import (
 	"fmt"
 	"io"
 	"os"
+	"strings"
 
 	"github.com/chzyer/readline"
+	"github.com/jacobsimpson/msh/command"
 )
 
 func main() {
@@ -23,6 +25,13 @@ func main() {
 			break
 		}
 
-		fmt.Printf("You said: %q\n", line)
+		switch strings.TrimSpace(line) {
+		case "exit":
+			command.Exit()
+		case "pwd":
+			command.PWD()
+		default:
+			fmt.Printf("You said: %q\n", line)
+		}
 	}
 }
