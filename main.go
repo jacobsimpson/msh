@@ -40,8 +40,6 @@ func main() {
 			cmd.Execute(program.Command.Arguments)
 		} else {
 			switch program.Command.Name {
-			case "exit":
-				builtin.Exit()
 			case "pwd":
 				builtin.PWD()
 			case "export":
