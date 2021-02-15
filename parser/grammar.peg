@@ -34,16 +34,30 @@ command = name:name arguments:(_ argument)* {
 
 name = [^ \n\t\r]+ {
     // Without this action, the representation of this data in the resulting
-    // AST would be in the form of array of array of byte. This single line
+    // AST would be in the form of array of array of bytes. This single line
     // changes the result of matching this rule to a single string.
     return strings.TrimSpace(string(c.text)), nil
 }
 
-argument = [^ \n\t\r]+ {
+argument = argument:(double_quoted_string / single_quoted_string / word) {
+    return argument, nil
+}
+
+word = [^ \n\t\r]+ {
     // Without this action, the representation of this data in the resulting
-    // AST would be in the form of array of array of byte. This single line
+    // AST would be in the form of array of array of bytes. This single line
     // changes the result of matching this rule to a single string.
     return strings.TrimSpace(string(c.text)), nil
+}
+
+double_quoted_string = '"' [^"]* '"' {
+    s := string(c.text)
+    return s[1:len(s)-1], nil
+}
+
+single_quoted_string = "'" [^']* "'" {
+    s := string(c.text)
+    return s[1:len(s)-1], nil
 }
 
 // The whitespace rule is used to capture whitespace. Most grammars that I

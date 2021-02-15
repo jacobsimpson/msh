@@ -42,6 +42,24 @@ func TestParse(t *testing.T) {
 				},
 			},
 		},
+		{
+			input: `echo " a b c d "`,
+			want: &Program{
+				Command: &Command{
+					Name:      "echo",
+					Arguments: []string{" a b c d "},
+				},
+			},
+		},
+		{
+			input: ` echo ' a b c d '`,
+			want: &Program{
+				Command: &Command{
+					Name:      "echo",
+					Arguments: []string{" a b c d "},
+				},
+			},
+		},
 	}
 
 	for _, test := range tests {
@@ -49,7 +67,7 @@ func TestParse(t *testing.T) {
 			assert := assert.New(t)
 			got, err := Parse("shell", []byte(test.input))
 			assert.NoError(err)
-			assert.Equal(got, test.want)
+			assert.Equal(test.want, got)
 		})
 	}
 }
