@@ -36,15 +36,12 @@ func main() {
 
 		program := ast.(*parser.Program)
 
-		if cmd := builtin.Get(program.Command.Name); cmd != nil {
+		if program.Command.Name == "" {
+			// Do nothing.
+		} else if cmd := builtin.Get(program.Command.Name); cmd != nil {
 			cmd.Execute(program.Command.Arguments)
 		} else {
-			switch program.Command.Name {
-			case "":
-				break
-			default:
-				command.ExecuteProgram(program.Command)
-			}
+			command.ExecuteProgram(program.Command)
 		}
 	}
 }
