@@ -40,6 +40,8 @@ func main() {
 			command.Exit()
 		case "pwd":
 			command.PWD()
+		case "export":
+			command.Export()
 		case "cd":
 			command.CD(program.Command.Arguments)
 		case "":

@@ -50,3 +50,9 @@ func ExecuteProgram(command *parser.Command) {
 		}
 	}
 }
+
+func Export() {
+	for _, e := range os.Environ() {
+		fmt.Printf("%s\n", e)
+	}
+}
