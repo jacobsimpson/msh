@@ -36,19 +36,23 @@ func main() {
 
 		program := ast.(*parser.Program)
 
-		switch program.Command.Name {
-		case "exit":
-			builtin.Exit()
-		case "pwd":
-			builtin.PWD()
-		case "export":
-			builtin.Export()
-		case "cd":
-			builtin.CD(program.Command.Arguments)
-		case "":
-			break
-		default:
-			command.ExecuteProgram(program.Command)
+		if cmd := builtin.Get(program.Command.Name); cmd != nil {
+			cmd.Execute(program.Command.Arguments)
+		} else {
+			switch program.Command.Name {
+			case "exit":
+				builtin.Exit()
+			case "pwd":
+				builtin.PWD()
+			case "export":
+				builtin.Export()
+			case "cd":
+				builtin.CD(program.Command.Arguments)
+			case "":
+				break
+			default:
+				command.ExecuteProgram(program.Command)
+			}
 		}
 	}
 }
