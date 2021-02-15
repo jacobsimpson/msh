@@ -9,6 +9,7 @@ var builtins = map[string]Command{
 	"exit":   &exit{},
 	"pwd":    &pwd{},
 	"export": &export{},
+	"help":   &help{},
 }
 
 func Get(name string) Command {
