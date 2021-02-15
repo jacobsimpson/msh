@@ -26,3 +26,5 @@ func (e *exit) Execute(args []string) int {
 }
 
 func (*exit) Name() string { return "exit" }
+
+func (*exit) ShortHelp() string { return "exit [status]" }

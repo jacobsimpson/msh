@@ -3,6 +3,7 @@ package builtin
 type Command interface {
 	Execute(args []string) int
 	Name() string
+	ShortHelp() string
 }
 
 var builtins = map[string]Command{}

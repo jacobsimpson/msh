@@ -18,3 +18,5 @@ func (*pwd) Execute(args []string) int {
 }
 
 func (*pwd) Name() string { return "pwd" }
+
+func (*pwd) ShortHelp() string { return "pwd" }

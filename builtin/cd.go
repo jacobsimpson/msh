@@ -63,6 +63,8 @@ func (c *cd) Execute(args []string) int {
 
 func (*cd) Name() string { return "cd" }
 
+func (*cd) ShortHelp() string { return "cd [dir]" }
+
 func all(s string, r rune) bool {
 	for _, c := range s {
 		if c != r {

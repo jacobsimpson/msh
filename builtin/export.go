@@ -15,3 +15,5 @@ func (*export) Execute([]string) int {
 }
 
 func (*export) Name() string { return "export" }
+
+func (*export) ShortHelp() string { return "export" }
