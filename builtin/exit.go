@@ -24,3 +24,5 @@ func (e *exit) Execute(args []string) int {
 	os.Exit(0)
 	return 0
 }
+
+func (*exit) Name() string { return "exit" }

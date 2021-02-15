@@ -16,3 +16,5 @@ func (*pwd) Execute(args []string) int {
 	fmt.Printf("%s\n", wd)
 	return 0
 }
+
+func (*pwd) Name() string { return "pwd" }

@@ -61,6 +61,8 @@ func (c *cd) Execute(args []string) int {
 	return 0
 }
 
+func (*cd) Name() string { return "cd" }
+
 func all(s string, r rune) bool {
 	for _, c := range s {
 		if c != r {

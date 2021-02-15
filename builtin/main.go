@@ -2,14 +2,22 @@ package builtin
 
 type Command interface {
 	Execute(args []string) int
+	Name() string
 }
 
-var builtins = map[string]Command{
-	"cd":     &cd{},
-	"exit":   &exit{},
-	"pwd":    &pwd{},
-	"export": &export{},
-	"help":   &help{},
+var builtins = map[string]Command{}
+
+func init() {
+	var l = []Command{
+		&cd{},
+		&exit{},
+		&pwd{},
+		&export{},
+		&help{},
+	}
+	for _, b := range l {
+		builtins[b.Name()] = b
+	}
 }
 
 func Get(name string) Command {

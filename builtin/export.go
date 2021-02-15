@@ -13,3 +13,5 @@ func (*export) Execute([]string) int {
 	}
 	return 0
 }
+
+func (*export) Name() string { return "export" }
