@@ -40,8 +40,6 @@ func main() {
 			cmd.Execute(program.Command.Arguments)
 		} else {
 			switch program.Command.Name {
-			case "pwd":
-				builtin.PWD()
 			case "export":
 				builtin.Export()
 			case "":

@@ -7,6 +7,7 @@ type Command interface {
 var builtins = map[string]Command{
 	"cd":   &cd{},
 	"exit": &exit{},
+	"pwd":  &pwd{},
 }
 
 func Get(name string) Command {
