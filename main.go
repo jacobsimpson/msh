@@ -42,6 +42,8 @@ func main() {
 			command.PWD()
 		case "cd":
 			command.CD(program.Command.Arguments)
+		case "":
+			break
 		default:
 			command.ExecuteProgram(program.Command)
 		}

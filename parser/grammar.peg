@@ -12,7 +12,9 @@ type Command struct {
 }
 
 // Comment goes.
-program = _ command:command _ {
+program = _ EOF {
+    return &Program{&Command{}}, nil
+} / _ command:command _ EOF {
     return &Program{command.(*Command)}, nil
 }
 
@@ -45,3 +47,6 @@ argument = [^ \n\t\r]+ {
 // build are not whitespace sensitive, so the results of matching this will
 // normally be discarded somehow.
 _ "whitespace" <- [ \n\t\r]*
+
+// An EOF character is anything that is not a character.
+EOF = !.
