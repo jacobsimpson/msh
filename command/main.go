@@ -36,7 +36,7 @@ func init() {
 func CD(args []string) {
 	dst := ""
 	updateHistory := true
-	if len(args) == 0 {
+	if len(args) == 0 || args[0] == "~" {
 		dst = os.Getenv("HOME")
 	} else if args[0] == "#" {
 		for i, d := range directoryHistory.directories {
