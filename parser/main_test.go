@@ -33,6 +33,15 @@ func TestParse(t *testing.T) {
 				},
 			},
 		},
+		{
+			input: `ls -l -a`,
+			want: &Program{
+				Command: &Command{
+					Name:      "ls",
+					Arguments: []string{"-l", "-a"},
+				},
+			},
+		},
 	}
 
 	for _, test := range tests {

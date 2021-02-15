@@ -18,14 +18,17 @@ program = _ EOF {
     return &Program{command.(*Command)}, nil
 }
 
-command = name:name _ argument:argument? {
-    var arguments []string
-    if argument!=nil{
-        arguments = append(arguments, argument.(string))
+command = name:name arguments:(_ argument)* {
+    var result []string
+    if arguments != nil {
+        for _, p := range arguments.([]interface{}) {
+            a := p.([]interface{})
+            result = append(result, a[1].(string))
+        }
     }
     return &Command{
         Name: name.(string),
-        Arguments: arguments,
+        Arguments: result,
     }, nil
 }
 
