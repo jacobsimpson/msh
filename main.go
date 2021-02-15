@@ -46,8 +46,6 @@ func main() {
 				builtin.PWD()
 			case "export":
 				builtin.Export()
-			case "cd":
-				builtin.CD(program.Command.Arguments)
 			case "":
 				break
 			default:

@@ -18,7 +18,9 @@ func init() {
 	directoryHistory = dh
 }
 
-func CD(args []string) {
+type cd struct{}
+
+func (c *cd) Execute(args []string) int {
 	dst := ""
 	updateHistory := true
 	if len(args) == 0 || args[0] == "~" {
@@ -31,7 +33,7 @@ func CD(args []string) {
 			}
 			fmt.Printf("%s %s\n", color.Blue(marker), d)
 		}
-		return
+		return 1
 	} else if all(args[0], rune('-')) {
 		for i := 0; i < len(args[0]); i++ {
 			dst = directoryHistory.back()
@@ -51,11 +53,12 @@ func CD(args []string) {
 	}
 	if err := os.Chdir(dst); err != nil {
 		fmt.Fprintf(os.Stderr, "no such file or directory: %s", dst)
-		return
+		return 1
 	}
 	if updateHistory {
 		directoryHistory.add(dst)
 	}
+	return 0
 }
 
 func all(s string, r rune) bool {
