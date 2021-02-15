@@ -4,7 +4,6 @@ import (
 	"fmt"
 	"os"
 	"os/exec"
-	"os/user"
 	"path/filepath"
 
 	"github.com/jacobsimpson/msh/color"
@@ -38,12 +37,7 @@ func CD(args []string) {
 	dst := ""
 	updateHistory := true
 	if len(args) == 0 {
-		usr, err := user.Current()
-		if err != nil {
-			fmt.Fprintf(os.Stderr, "unable to determine home directory: %+v", err)
-			return
-		}
-		dst = usr.HomeDir
+		dst = os.Getenv("HOME")
 	} else if args[0] == "#" {
 		for i, d := range directoryHistory.directories {
 			marker := " "
