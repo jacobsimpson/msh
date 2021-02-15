@@ -7,6 +7,7 @@ import (
 	"os/user"
 	"path/filepath"
 
+	"github.com/jacobsimpson/msh/color"
 	"github.com/jacobsimpson/msh/parser"
 )
 
@@ -44,7 +45,13 @@ func CD(args []string) {
 		}
 		dst = usr.HomeDir
 	} else if args[0] == "#" {
-		fmt.Printf("%s", directoryHistory.String())
+		for i, d := range directoryHistory.directories {
+			marker := " "
+			if i == directoryHistory.current {
+				marker = "*"
+			}
+			fmt.Printf("%s %s\n", color.Blue(marker), d)
+		}
 		return
 	} else if all(args[0], rune('-')) {
 		for i := 0; i < len(args[0]); i++ {
