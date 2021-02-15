@@ -8,6 +8,7 @@ import (
 	"os"
 
 	"github.com/chzyer/readline"
+	"github.com/jacobsimpson/msh/builtin"
 	"github.com/jacobsimpson/msh/command"
 	"github.com/jacobsimpson/msh/parser"
 )
@@ -37,13 +38,13 @@ func main() {
 
 		switch program.Command.Name {
 		case "exit":
-			command.Exit()
+			builtin.Exit()
 		case "pwd":
-			command.PWD()
+			builtin.PWD()
 		case "export":
-			command.Export()
+			builtin.Export()
 		case "cd":
-			command.CD(program.Command.Arguments)
+			builtin.CD(program.Command.Arguments)
 		case "":
 			break
 		default:
