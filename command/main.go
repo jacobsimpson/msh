@@ -46,19 +46,15 @@ func CD(args []string) {
 	} else if args[0] == "#" {
 		fmt.Printf("%s", directoryHistory.String())
 		return
-	} else if args[0] == "-" {
-		dst = directoryHistory.back()
+	} else if all(args[0], rune('-')) {
+		for i := 0; i < len(args[0]); i++ {
+			dst = directoryHistory.back()
+		}
 		updateHistory = false
-	} else if args[0] == "--" {
-		dst = directoryHistory.back()
-		dst = directoryHistory.back()
-		updateHistory = false
-	} else if args[0] == "+" {
-		dst = directoryHistory.forward()
-		updateHistory = false
-	} else if args[0] == "++" {
-		dst = directoryHistory.forward()
-		dst = directoryHistory.forward()
+	} else if all(args[0], rune('+')) {
+		for i := 0; i < len(args[0]); i++ {
+			dst = directoryHistory.forward()
+		}
 		updateHistory = false
 	} else if args[0] == "." {
 		dst = directoryHistory.get()
@@ -74,6 +70,15 @@ func CD(args []string) {
 	if updateHistory {
 		directoryHistory.add(dst)
 	}
+}
+
+func all(s string, r rune) bool {
+	for _, c := range s {
+		if c != r {
+			return false
+		}
+	}
+	return true
 }
 
 func ExecuteProgram(command *parser.Command) {
