@@ -47,7 +47,7 @@ truncate_redirect = '>' _ target:argument {
     }, nil
 }
 
-append_redirect = '>' '>' _ target:argument {
+append_redirect = ">>" _ target:argument {
     return &Redirection{
         Target: target.(string),
         Type:   Append,
