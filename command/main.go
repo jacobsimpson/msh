@@ -2,20 +2,20 @@ package command
 
 import (
 	"fmt"
-	"os"
+	"io"
 	"os/exec"
 
 	"github.com/jacobsimpson/msh/parser"
 )
 
-func ExecuteProgram(command *parser.Command) {
+func ExecuteProgram(stdin io.Reader, stdout, stderr io.Writer, command *parser.Command) {
 	cmd := exec.Command(command.Name, command.Arguments...)
-	cmd.Stdout = os.Stdout
-	cmd.Stderr = os.Stderr
+	cmd.Stdout = stdout
+	cmd.Stderr = stderr
 	err := cmd.Run()
 	if err != nil {
 		if _, ok := err.(*exec.ExitError); !ok {
-			fmt.Fprintf(os.Stderr, "msh: command not found: %s\n", command.Name)
+			fmt.Fprintf(stderr, "msh: command not found: %s\n", command.Name)
 		}
 	}
 }
