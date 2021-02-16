@@ -49,7 +49,7 @@ func evaluateRedirection(stdio *stdio, cmd *parser.Redirection) {
 	case parser.Truncate:
 		f, err := os.Create(cmd.Target)
 		if err != nil {
-			fmt.Fprintf(os.Stderr, "msh: %+v", err)
+			fmt.Fprintf(stdio.err, "msh: %+v", err)
 			return
 		}
 		stdio.out = f
@@ -57,7 +57,7 @@ func evaluateRedirection(stdio *stdio, cmd *parser.Redirection) {
 	case parser.TruncateAll:
 		f, err := os.Create(cmd.Target)
 		if err != nil {
-			fmt.Fprintf(os.Stderr, "msh: %+v", err)
+			fmt.Fprintf(stdio.err, "msh: %+v", err)
 			return
 		}
 		stdio.out = f
@@ -66,7 +66,7 @@ func evaluateRedirection(stdio *stdio, cmd *parser.Redirection) {
 	case parser.Append:
 		f, err := os.OpenFile(cmd.Target, os.O_APPEND|os.O_CREATE|os.O_WRONLY, 0644)
 		if err != nil {
-			fmt.Fprintf(os.Stderr, "msh: %+v", err)
+			fmt.Fprintf(stdio.err, "msh: %+v", err)
 			return
 		}
 		stdio.out = f
