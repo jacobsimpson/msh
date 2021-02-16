@@ -17,3 +17,7 @@ func (*export) Execute([]string) int {
 func (*export) Name() string { return "export" }
 
 func (*export) ShortHelp() string { return "export" }
+
+func (*export) LongHelp() string {
+	return "Lists all the environment variables that are defined."
+}

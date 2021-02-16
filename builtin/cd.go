@@ -65,6 +65,10 @@ func (*cd) Name() string { return "cd" }
 
 func (*cd) ShortHelp() string { return "cd [dir]" }
 
+func (*cd) LongHelp() string {
+	return "Change the current directory to DIR. The variable $HOME is the default DIR. There are a few shortcuts available. `cd ~` changes the current directory to the value of $HOME, `cd -` moves down the previous directory stack. `cd --` moves down the previous directory stack by two. `cd +` moves up the previous directory stack. `cd #` shows the previous directory stack."
+}
+
 func all(s string, r rune) bool {
 	for _, c := range s {
 		if c != r {

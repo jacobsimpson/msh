@@ -19,9 +19,20 @@ func (*help) Execute(args []string) int {
 			continue
 		}
 		fmt.Printf("%s: %s\n", arg, b.ShortHelp())
+		for _, line := range wrap(b.LongHelp()) {
+			fmt.Printf("    %s\n", line)
+		}
 		status = 0
 	}
 	return status
+}
+
+func (*help) Name() string { return "help" }
+
+func (*help) ShortHelp() string { return "help [pattern]" }
+
+func (*help) LongHelp() string {
+	return "Display helpful information about builtin commands. If PATTERN is specified, gives detailed help on all commands matching PATTERN, otherwise a list of the builtins is printed."
 }
 
 func printHelpSummary() int {
@@ -39,7 +50,3 @@ func printHelpSummary() int {
 	fmt.Println()
 	return 0
 }
-
-func (*help) Name() string { return "help" }
-
-func (*help) ShortHelp() string { return "help" }

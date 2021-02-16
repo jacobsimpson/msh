@@ -28,3 +28,7 @@ func (e *exit) Execute(args []string) int {
 func (*exit) Name() string { return "exit" }
 
 func (*exit) ShortHelp() string { return "exit [status]" }
+
+func (*exit) LongHelp() string {
+	return "Exit the shell with a status of N. If N is omitted, the exit status is that of the last command executed."
+}
