@@ -6,7 +6,7 @@ package parser
 program = _ EOF {
     return &Program{&Exec{}}, nil
 } / _ command:command _ EOF {
-    return &Program{command.(*Exec)}, nil
+    return &Program{command.(Command)}, nil
 }
 
 command = name:name arguments:(_ argument)* redirection:(_ redirection)? {
@@ -17,11 +17,19 @@ command = name:name arguments:(_ argument)* redirection:(_ redirection)? {
             result = append(result, a[1].(string))
         }
     }
-    return &Exec{
+
+    e := &Exec{
         Name:        name.(string),
         Arguments:   result,
-        Redirection: getRedirection(redirection),
-    }, nil
+    }
+
+    r := getRedirection(redirection)
+    if r !=nil {
+        r.Command = e
+        return r, nil
+    }
+
+    return e, nil
 }
 
 name = [^ \n\t\r>&]+ {

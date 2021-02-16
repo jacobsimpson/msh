@@ -2,6 +2,7 @@ package interpreter
 
 import (
 	"fmt"
+	"io"
 	"os"
 
 	"github.com/jacobsimpson/msh/interpreter/builtin"
@@ -9,46 +10,68 @@ import (
 	"github.com/jacobsimpson/msh/parser"
 )
 
+type stdio struct {
+	in  io.Reader
+	out io.Writer
+	err io.Writer
+}
+
 func Evaluate(program *parser.Program) {
-	stdin, stdout, stderr := os.Stdin, os.Stdout, os.Stderr
-
-	cmd := program.Command.(*parser.Exec)
-
-	if cmd.Redirection != nil {
-		switch cmd.Redirection.Type {
-		case parser.Truncate:
-			f, err := os.Create(cmd.Redirection.Target)
-			if err != nil {
-				fmt.Fprintf(os.Stderr, "msh: %+v", err)
-				return
-			}
-			stdout = f
-			defer f.Close()
-		case parser.TruncateAll:
-			f, err := os.Create(cmd.Redirection.Target)
-			if err != nil {
-				fmt.Fprintf(os.Stderr, "msh: %+v", err)
-				return
-			}
-			stdout = f
-			stderr = f
-			defer f.Close()
-		case parser.Append:
-			f, err := os.OpenFile(cmd.Redirection.Target, os.O_APPEND|os.O_CREATE|os.O_WRONLY, 0644)
-			if err != nil {
-				fmt.Fprintf(os.Stderr, "msh: %+v", err)
-				return
-			}
-			stdout = f
-			defer f.Close()
-		}
+	stdio := &stdio{
+		in:  os.Stdin,
+		out: os.Stdout,
+		err: os.Stderr,
 	}
+	evaluate(stdio, program.Command)
+}
 
+func evaluate(stdio *stdio, cmd parser.Command) {
+	switch c := cmd.(type) {
+	case *parser.Exec:
+		evaluateExec(stdio, c)
+	case *parser.Redirection:
+		evaluateRedirection(stdio, c)
+	}
+}
+
+func evaluateExec(stdio *stdio, cmd *parser.Exec) {
 	if cmd.Name == "" {
 		// Do nothing.
 	} else if c := builtin.Get(cmd.Name); c != nil {
-		c.Execute(stdin, stdout, stderr, cmd.Arguments)
+		c.Execute(stdio.in, stdio.out, stdio.err, cmd.Arguments)
 	} else {
-		command.ExecuteProgram(stdin, stdout, stderr, cmd)
+		command.ExecuteProgram(stdio.in, stdio.out, stdio.err, cmd)
 	}
+}
+
+func evaluateRedirection(stdio *stdio, cmd *parser.Redirection) {
+	switch cmd.Type {
+	case parser.Truncate:
+		f, err := os.Create(cmd.Target)
+		if err != nil {
+			fmt.Fprintf(os.Stderr, "msh: %+v", err)
+			return
+		}
+		stdio.out = f
+		defer f.Close()
+	case parser.TruncateAll:
+		f, err := os.Create(cmd.Target)
+		if err != nil {
+			fmt.Fprintf(os.Stderr, "msh: %+v", err)
+			return
+		}
+		stdio.out = f
+		stdio.err = f
+		defer f.Close()
+	case parser.Append:
+		f, err := os.OpenFile(cmd.Target, os.O_APPEND|os.O_CREATE|os.O_WRONLY, 0644)
+		if err != nil {
+			fmt.Fprintf(os.Stderr, "msh: %+v", err)
+			return
+		}
+		stdio.out = f
+		defer f.Close()
+	}
+
+	evaluate(stdio, cmd.Command)
 }

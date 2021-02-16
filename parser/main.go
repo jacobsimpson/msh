@@ -7,9 +7,8 @@ type Program struct {
 type Command interface{}
 
 type Exec struct {
-	Name        string
-	Arguments   []string
-	Redirection *Redirection
+	Name      string
+	Arguments []string
 }
 
 type Type int
@@ -21,8 +20,9 @@ const (
 )
 
 type Redirection struct {
-	Type   Type
-	Target string
+	Type    Type
+	Target  string
+	Command Command
 }
 
 func getRedirection(stdout interface{}) *Redirection {

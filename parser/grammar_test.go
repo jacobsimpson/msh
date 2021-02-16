@@ -63,39 +63,51 @@ func TestParse(t *testing.T) {
 		{
 			input: `pwd>output.txt`,
 			want: &Program{
-				Command: &Exec{
-					Name:        "pwd",
-					Redirection: &Redirection{Truncate, "output.txt"},
+				Command: &Redirection{
+					Truncate,
+					"output.txt",
+					&Exec{
+						Name: "pwd",
+					},
 				},
 			},
 		},
 		{
 			input: `echo "this is the thing"    >    output.txt`,
 			want: &Program{
-				Command: &Exec{
-					Name:        "echo",
-					Arguments:   []string{"this is the thing"},
-					Redirection: &Redirection{Truncate, "output.txt"},
+				Command: &Redirection{
+					Truncate,
+					"output.txt",
+					&Exec{
+						Name:      "echo",
+						Arguments: []string{"this is the thing"},
+					},
 				},
 			},
 		},
 		{
 			input: `echo "this is the thing"    >>    output.txt`,
 			want: &Program{
-				Command: &Exec{
-					Name:        "echo",
-					Arguments:   []string{"this is the thing"},
-					Redirection: &Redirection{Append, "output.txt"},
+				Command: &Redirection{
+					Append,
+					"output.txt",
+					&Exec{
+						Name:      "echo",
+						Arguments: []string{"this is the thing"},
+					},
 				},
 			},
 		},
 		{
 			input: `echo "this is the thing" >& output.txt`,
 			want: &Program{
-				Command: &Exec{
-					Name:        "echo",
-					Arguments:   []string{"this is the thing"},
-					Redirection: &Redirection{TruncateAll, "output.txt"},
+				Command: &Redirection{
+					TruncateAll,
+					"output.txt",
+					&Exec{
+						Name:      "echo",
+						Arguments: []string{"this is the thing"},
+					},
 				},
 			},
 		},
