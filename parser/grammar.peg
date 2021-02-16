@@ -5,9 +5,9 @@ package parser
 
 // Comment goes.
 program = _ EOF {
-    return &Program{&Command{}}, nil
+    return &Program{&Exec{}}, nil
 } / _ command:command _ EOF {
-    return &Program{command.(*Command)}, nil
+    return &Program{command.(*Exec)}, nil
 }
 
 command = name:name arguments:(_ argument)* redirection:(_ redirection)? {
@@ -18,7 +18,7 @@ command = name:name arguments:(_ argument)* redirection:(_ redirection)? {
             result = append(result, a[1].(string))
         }
     }
-    return &Command{
+    return &Exec{
         Name:        name.(string),
         Arguments:   result,
         Redirection: getRedirection(redirection),

@@ -1,10 +1,10 @@
 package parser
 
 type Program struct {
-	Command *Command
+	Command *Exec
 }
 
-type Command struct {
+type Exec struct {
 	Name        string
 	Arguments   []string
 	Redirection *Redirection

@@ -14,20 +14,20 @@ func TestParse(t *testing.T) {
 		{
 			input: "cd",
 			want: &Program{
-				Command: &Command{Name: "cd"},
+				Command: &Exec{Name: "cd"},
 			},
 		},
 		{
 			input: `     cd
 			`,
 			want: &Program{
-				Command: &Command{Name: "cd"},
+				Command: &Exec{Name: "cd"},
 			},
 		},
 		{
 			input: ` cd /123`,
 			want: &Program{
-				Command: &Command{
+				Command: &Exec{
 					Name:      "cd",
 					Arguments: []string{"/123"},
 				},
@@ -36,7 +36,7 @@ func TestParse(t *testing.T) {
 		{
 			input: `ls -l -a`,
 			want: &Program{
-				Command: &Command{
+				Command: &Exec{
 					Name:      "ls",
 					Arguments: []string{"-l", "-a"},
 				},
@@ -45,7 +45,7 @@ func TestParse(t *testing.T) {
 		{
 			input: `echo " a b c d "`,
 			want: &Program{
-				Command: &Command{
+				Command: &Exec{
 					Name:      "echo",
 					Arguments: []string{" a b c d "},
 				},
@@ -54,7 +54,7 @@ func TestParse(t *testing.T) {
 		{
 			input: ` echo ' a b c d '`,
 			want: &Program{
-				Command: &Command{
+				Command: &Exec{
 					Name:      "echo",
 					Arguments: []string{" a b c d "},
 				},
@@ -63,7 +63,7 @@ func TestParse(t *testing.T) {
 		{
 			input: `pwd>output.txt`,
 			want: &Program{
-				Command: &Command{
+				Command: &Exec{
 					Name:        "pwd",
 					Redirection: &Redirection{Truncate, "output.txt"},
 				},
@@ -72,7 +72,7 @@ func TestParse(t *testing.T) {
 		{
 			input: `echo "this is the thing"    >    output.txt`,
 			want: &Program{
-				Command: &Command{
+				Command: &Exec{
 					Name:        "echo",
 					Arguments:   []string{"this is the thing"},
 					Redirection: &Redirection{Truncate, "output.txt"},
@@ -82,7 +82,7 @@ func TestParse(t *testing.T) {
 		{
 			input: `echo "this is the thing"    >>    output.txt`,
 			want: &Program{
-				Command: &Command{
+				Command: &Exec{
 					Name:        "echo",
 					Arguments:   []string{"this is the thing"},
 					Redirection: &Redirection{Append, "output.txt"},
@@ -92,7 +92,7 @@ func TestParse(t *testing.T) {
 		{
 			input: `echo "this is the thing" >& output.txt`,
 			want: &Program{
-				Command: &Command{
+				Command: &Exec{
 					Name:        "echo",
 					Arguments:   []string{"this is the thing"},
 					Redirection: &Redirection{TruncateAll, "output.txt"},

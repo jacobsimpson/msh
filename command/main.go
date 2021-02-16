@@ -8,7 +8,7 @@ import (
 	"github.com/jacobsimpson/msh/parser"
 )
 
-func ExecuteProgram(stdin io.Reader, stdout, stderr io.Writer, command *parser.Command) {
+func ExecuteProgram(stdin io.Reader, stdout, stderr io.Writer, command *parser.Exec) {
 	cmd := exec.Command(command.Name, command.Arguments...)
 	cmd.Stdout = stdout
 	cmd.Stderr = stderr
