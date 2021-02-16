@@ -36,10 +36,21 @@ argument = argument:(double_quoted_string / single_quoted_string / word) {
     return argument, nil
 }
 
-redirection = '>' _ target:argument {
+redirection = redirection:(truncate_redirect / append_redirect) {
+    return redirection, nil
+}
+
+truncate_redirect = '>' _ target:argument {
     return &Redirection{
         Target: target.(string),
         Type:   Truncate,
+    }, nil
+}
+
+append_redirect = '>' '>' _ target:argument {
+    return &Redirection{
+        Target: target.(string),
+        Type:   Append,
     }, nil
 }
 

@@ -52,13 +52,24 @@ func evaluate(program *parser.Program) {
 	stdin, stdout, stderr := os.Stdin, os.Stdout, os.Stderr
 
 	if program.Command.Redirection != nil {
-		f, err := os.Create(program.Command.Redirection.Target)
-		if err != nil {
-			fmt.Fprintf(os.Stderr, "msh: %+v", err)
-			return
+		switch program.Command.Redirection.Type {
+		case parser.Truncate:
+			f, err := os.Create(program.Command.Redirection.Target)
+			if err != nil {
+				fmt.Fprintf(os.Stderr, "msh: %+v", err)
+				return
+			}
+			stdout = f
+			defer f.Close()
+		case parser.Append:
+			f, err := os.OpenFile(program.Command.Redirection.Target, os.O_APPEND|os.O_CREATE|os.O_WRONLY, 0644)
+			if err != nil {
+				fmt.Fprintf(os.Stderr, "msh: %+v", err)
+				return
+			}
+			stdout = f
+			defer f.Close()
 		}
-		stdout = f
-		defer f.Close()
 	}
 
 	if program.Command.Name == "" {

@@ -79,6 +79,16 @@ func TestParse(t *testing.T) {
 				},
 			},
 		},
+		{
+			input: `echo "this is the thing"    >>    output.txt`,
+			want: &Program{
+				Command: &Command{
+					Name:        "echo",
+					Arguments:   []string{"this is the thing"},
+					Redirection: &Redirection{Append, "output.txt"},
+				},
+			},
+		},
 	}
 
 	for _, test := range tests {

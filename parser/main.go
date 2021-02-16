@@ -14,6 +14,7 @@ type Type int
 
 const (
 	Truncate Type = iota
+	Append
 )
 
 type Redirection struct {
