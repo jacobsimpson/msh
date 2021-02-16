@@ -60,6 +60,25 @@ func TestParse(t *testing.T) {
 				},
 			},
 		},
+		{
+			input: `pwd>output.txt`,
+			want: &Program{
+				Command: &Command{
+					Name:   "pwd",
+					Stdout: "output.txt",
+				},
+			},
+		},
+		{
+			input: `echo "this is the thing"    >    output.txt`,
+			want: &Program{
+				Command: &Command{
+					Name:      "echo",
+					Arguments: []string{"this is the thing"},
+					Stdout:    "output.txt",
+				},
+			},
+		},
 	}
 
 	for _, test := range tests {

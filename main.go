@@ -44,16 +44,28 @@ func main() {
 			continue
 		}
 
-		program := ast.(*parser.Program)
+		evaluate(ast.(*parser.Program))
+	}
+}
 
-		stdin, stdout, stderr := os.Stdin, os.Stdout, os.Stderr
+func evaluate(program *parser.Program) {
+	stdin, stdout, stderr := os.Stdin, os.Stdout, os.Stderr
 
-		if program.Command.Name == "" {
-			// Do nothing.
-		} else if cmd := builtin.Get(program.Command.Name); cmd != nil {
-			cmd.Execute(stdin, stdout, stderr, program.Command.Arguments)
-		} else {
-			command.ExecuteProgram(stdin, stdout, stderr, program.Command)
+	if program.Command.Stdout != "" {
+		f, err := os.Create(program.Command.Stdout)
+		if err != nil {
+			fmt.Fprintf(os.Stderr, "msh: %+v", err)
+			return
 		}
+		stdout = f
+		defer f.Close()
+	}
+
+	if program.Command.Name == "" {
+		// Do nothing.
+	} else if cmd := builtin.Get(program.Command.Name); cmd != nil {
+		cmd.Execute(stdin, stdout, stderr, program.Command.Arguments)
+	} else {
+		command.ExecuteProgram(stdin, stdout, stderr, program.Command)
 	}
 }

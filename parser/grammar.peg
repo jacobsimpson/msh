@@ -6,8 +6,17 @@ type Program struct {
 }
 
 type Command struct {
-    Name string
+    Name      string
     Arguments []string
+    Stdout    string
+}
+
+func getStdout(stdout interface{}) string {
+    if stdout == nil {
+        return ""
+    }
+    a := stdout.([]interface{})
+    return a[2].(string)
 }
 }
 
@@ -18,7 +27,7 @@ program = _ EOF {
     return &Program{command.(*Command)}, nil
 }
 
-command = name:name arguments:(_ argument)* {
+command = name:name arguments:(_ argument)* _ stdout:('>' _ argument)? {
     var result []string
     if arguments != nil {
         for _, p := range arguments.([]interface{}) {
@@ -27,12 +36,13 @@ command = name:name arguments:(_ argument)* {
         }
     }
     return &Command{
-        Name: name.(string),
+        Name:      name.(string),
         Arguments: result,
+        Stdout:    getStdout(stdout),
     }, nil
 }
 
-name = [^ \n\t\r]+ {
+name = [^ \n\t\r>]+ {
     // Without this action, the representation of this data in the resulting
     // AST would be in the form of array of array of bytes. This single line
     // changes the result of matching this rule to a single string.
@@ -43,7 +53,7 @@ argument = argument:(double_quoted_string / single_quoted_string / word) {
     return argument, nil
 }
 
-word = [^ \n\t\r]+ {
+word = [^ \n\t\r>]+ {
     // Without this action, the representation of this data in the resulting
     // AST would be in the form of array of array of bytes. This single line
     // changes the result of matching this rule to a single string.
