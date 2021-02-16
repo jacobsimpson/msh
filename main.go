@@ -46,12 +46,14 @@ func main() {
 
 		program := ast.(*parser.Program)
 
+		stdin, stdout, stderr := os.Stdin, os.Stdout, os.Stderr
+
 		if program.Command.Name == "" {
 			// Do nothing.
 		} else if cmd := builtin.Get(program.Command.Name); cmd != nil {
-			cmd.Execute(os.Stdin, os.Stdout, os.Stderr, program.Command.Arguments)
+			cmd.Execute(stdin, stdout, stderr, program.Command.Arguments)
 		} else {
-			command.ExecuteProgram(os.Stdin, os.Stdout, os.Stderr, program.Command)
+			command.ExecuteProgram(stdin, stdout, stderr, program.Command)
 		}
 	}
 }
