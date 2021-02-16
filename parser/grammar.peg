@@ -25,7 +25,7 @@ command = name:name arguments:(_ argument)* redirection:(_ redirection)? {
     }, nil
 }
 
-name = [^ \n\t\r>]+ {
+name = [^ \n\t\r>&]+ {
     // Without this action, the representation of this data in the resulting
     // AST would be in the form of array of array of bytes. This single line
     // changes the result of matching this rule to a single string.
@@ -36,7 +36,7 @@ argument = argument:(double_quoted_string / single_quoted_string / word) {
     return argument, nil
 }
 
-redirection = redirection:(truncate_redirect / append_redirect) {
+redirection = redirection:(truncate_redirect / truncate_redirect_all / append_redirect) {
     return redirection, nil
 }
 
@@ -47,6 +47,13 @@ truncate_redirect = '>' _ target:argument {
     }, nil
 }
 
+truncate_redirect_all = ">&" _ target:argument {
+    return &Redirection{
+        Target: target.(string),
+        Type:   TruncateAll,
+    }, nil
+}
+
 append_redirect = ">>" _ target:argument {
     return &Redirection{
         Target: target.(string),
@@ -54,7 +61,7 @@ append_redirect = ">>" _ target:argument {
     }, nil
 }
 
-word = [^ \n\t\r>]+ {
+word = [^ \n\t\r>&]+ {
     // Without this action, the representation of this data in the resulting
     // AST would be in the form of array of array of bytes. This single line
     // changes the result of matching this rule to a single string.

@@ -61,6 +61,15 @@ func evaluate(program *parser.Program) {
 			}
 			stdout = f
 			defer f.Close()
+		case parser.TruncateAll:
+			f, err := os.Create(program.Command.Redirection.Target)
+			if err != nil {
+				fmt.Fprintf(os.Stderr, "msh: %+v", err)
+				return
+			}
+			stdout = f
+			stderr = f
+			defer f.Close()
 		case parser.Append:
 			f, err := os.OpenFile(program.Command.Redirection.Target, os.O_APPEND|os.O_CREATE|os.O_WRONLY, 0644)
 			if err != nil {
