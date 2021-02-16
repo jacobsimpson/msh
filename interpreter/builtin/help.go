@@ -8,7 +8,7 @@ import (
 
 type help struct{}
 
-func (*help) Execute(stdin io.Reader, stdout, stderr io.Writer, args []string) int {
+func (*help) Execute(stdin io.ReadCloser, stdout, stderr io.WriteCloser, args []string) int {
 	if len(args) == 0 {
 		return printHelpSummary(stdin, stdout, stderr)
 	}

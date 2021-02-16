@@ -11,9 +11,9 @@ import (
 )
 
 type stdio struct {
-	in  io.Reader
-	out io.Writer
-	err io.Writer
+	in  io.ReadCloser
+	out io.WriteCloser
+	err io.WriteCloser
 }
 
 func Evaluate(program *parser.Program) {

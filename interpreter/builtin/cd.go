@@ -21,7 +21,7 @@ func init() {
 
 type cd struct{}
 
-func (c *cd) Execute(stdin io.Reader, stdout, stderr io.Writer, args []string) int {
+func (c *cd) Execute(stdin io.ReadCloser, stdout, stderr io.WriteCloser, args []string) int {
 	dst := ""
 	updateHistory := true
 	if len(args) == 0 || args[0] == "~" {

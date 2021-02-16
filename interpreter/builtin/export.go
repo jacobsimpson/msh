@@ -8,7 +8,7 @@ import (
 
 type export struct{}
 
-func (*export) Execute(stdin io.Reader, stdout, stderr io.Writer, args []string) int {
+func (*export) Execute(stdin io.ReadCloser, stdout, stderr io.WriteCloser, args []string) int {
 	for _, e := range os.Environ() {
 		fmt.Fprintf(stdout, "%s\n", e)
 	}

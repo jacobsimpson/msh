@@ -9,7 +9,7 @@ import (
 
 type exit struct{}
 
-func (e *exit) Execute(stdin io.Reader, stdout, stderr io.Writer, args []string) int {
+func (e *exit) Execute(stdin io.ReadCloser, stdout, stderr io.WriteCloser, args []string) int {
 	if len(args) > 1 {
 		fmt.Fprintf(stderr, "msh: exit: too many arguments\n")
 		return 1

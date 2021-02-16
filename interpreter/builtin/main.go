@@ -8,7 +8,7 @@ import (
 var Version string
 
 type Command interface {
-	Execute(in io.Reader, out, err io.Writer, args []string) int
+	Execute(in io.ReadCloser, out, err io.WriteCloser, args []string) int
 	Name() string
 	ShortHelp() string
 	LongHelp() string
