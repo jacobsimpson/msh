@@ -3,7 +3,7 @@
 msh
 coverage.out
 # Generated from the PEG grammar, this should never be checked in.
-parser/main.go
+parser/grammar.go
 
 
 # Editor backup files.

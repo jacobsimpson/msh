@@ -1,5 +1,5 @@
-//go:generate pigeon -o parser/main.go parser/grammar.peg
-//go:generate goimports -w parser/main.go
+//go:generate pigeon -o parser/grammar.go parser/grammar.peg
+//go:generate goimports -w parser/grammar.go
 package main
 
 import (
