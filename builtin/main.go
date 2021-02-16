@@ -1,11 +1,14 @@
 package builtin
 
-import "strings"
+import (
+	"io"
+	"strings"
+)
 
 var Version string
 
 type Command interface {
-	Execute(args []string) int
+	Execute(in io.Reader, out, err io.Writer, args []string) int
 	Name() string
 	ShortHelp() string
 	LongHelp() string

@@ -2,6 +2,7 @@ package builtin
 
 import (
 	"fmt"
+	"io"
 	"os"
 	"path/filepath"
 
@@ -20,7 +21,7 @@ func init() {
 
 type cd struct{}
 
-func (c *cd) Execute(args []string) int {
+func (c *cd) Execute(stdin io.Reader, stdout, stderr io.Writer, args []string) int {
 	dst := ""
 	updateHistory := true
 	if len(args) == 0 || args[0] == "~" {
@@ -31,7 +32,7 @@ func (c *cd) Execute(args []string) int {
 			if i == directoryHistory.current {
 				marker = "*"
 			}
-			fmt.Printf("%s %s\n", color.Blue(marker), d)
+			fmt.Fprintf(stdout, "%s %s\n", color.Blue(marker), d)
 		}
 		return 1
 	} else if all(args[0], rune('-')) {
@@ -52,7 +53,7 @@ func (c *cd) Execute(args []string) int {
 		dst = args[0]
 	}
 	if err := os.Chdir(dst); err != nil {
-		fmt.Fprintf(os.Stderr, "no such file or directory: %s", dst)
+		fmt.Fprintf(stderr, "no such file or directory: %s", dst)
 		return 1
 	}
 	if updateHistory {

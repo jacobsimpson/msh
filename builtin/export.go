@@ -2,14 +2,15 @@ package builtin
 
 import (
 	"fmt"
+	"io"
 	"os"
 )
 
 type export struct{}
 
-func (*export) Execute([]string) int {
+func (*export) Execute(stdin io.Reader, stdout, stderr io.Writer, args []string) int {
 	for _, e := range os.Environ() {
-		fmt.Printf("%s\n", e)
+		fmt.Fprintf(stdout, "%s\n", e)
 	}
 	return 0
 }

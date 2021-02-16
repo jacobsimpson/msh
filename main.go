@@ -30,6 +30,12 @@ func main() {
 		os.Exit(1)
 	}
 
+	file, err := os.Create("output.txt")
+	if err != nil {
+		fmt.Fprintf(os.Stderr, "Unable to open file: %+v\n", err)
+		os.Exit(1)
+	}
+
 	for {
 		line, err := r.Readline()
 		if err == readline.ErrInterrupt {
@@ -49,7 +55,7 @@ func main() {
 		if program.Command.Name == "" {
 			// Do nothing.
 		} else if cmd := builtin.Get(program.Command.Name); cmd != nil {
-			cmd.Execute(program.Command.Arguments)
+			cmd.Execute(os.Stdin, os.Stdout, os.Stderr, program.Command.Arguments)
 		} else {
 			command.ExecuteProgram(program.Command)
 		}
