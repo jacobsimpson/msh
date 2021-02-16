@@ -4,8 +4,8 @@ import (
 	"fmt"
 	"os"
 
-	"github.com/jacobsimpson/msh/builtin"
 	"github.com/jacobsimpson/msh/command"
+	"github.com/jacobsimpson/msh/interpreter/builtin"
 	"github.com/jacobsimpson/msh/parser"
 )
 
