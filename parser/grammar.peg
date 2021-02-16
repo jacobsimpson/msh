@@ -16,7 +16,7 @@ func getStdout(stdout interface{}) string {
         return ""
     }
     a := stdout.([]interface{})
-    return a[2].(string)
+    return a[1].(string)
 }
 }
 
@@ -27,7 +27,7 @@ program = _ EOF {
     return &Program{command.(*Command)}, nil
 }
 
-command = name:name arguments:(_ argument)* _ stdout:('>' _ argument)? {
+command = name:name arguments:(_ argument)* redirection:(_ redirection)? {
     var result []string
     if arguments != nil {
         for _, p := range arguments.([]interface{}) {
@@ -38,7 +38,7 @@ command = name:name arguments:(_ argument)* _ stdout:('>' _ argument)? {
     return &Command{
         Name:      name.(string),
         Arguments: result,
-        Stdout:    getStdout(stdout),
+        Stdout:    getStdout(redirection),
     }, nil
 }
 
@@ -51,6 +51,10 @@ name = [^ \n\t\r>]+ {
 
 argument = argument:(double_quoted_string / single_quoted_string / word) {
     return argument, nil
+}
+
+redirection = '>' _ target:argument {
+    return target, nil
 }
 
 word = [^ \n\t\r>]+ {
