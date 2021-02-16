@@ -8,8 +8,9 @@ import (
 	"os"
 
 	"github.com/chzyer/readline"
-	"github.com/jacobsimpson/msh/builtin"
+	"github.com/jacobsimpson/msh/color"
 	"github.com/jacobsimpson/msh/interpreter"
+	"github.com/jacobsimpson/msh/interpreter/builtin"
 	"github.com/jacobsimpson/msh/parser"
 	flag "github.com/spf13/pflag"
 )
@@ -31,6 +32,7 @@ func main() {
 	}
 
 	for {
+		r.SetPrompt(calculatePrompt())
 		line, err := r.Readline()
 		if err == readline.ErrInterrupt {
 			continue
@@ -46,4 +48,12 @@ func main() {
 
 		interpreter.Evaluate(ast.(*parser.Program))
 	}
+}
+
+func calculatePrompt() string {
+	d, err := os.Getwd()
+	if err != nil {
+		return fmt.Sprintf("%s %s ", color.Red("<error>"), color.Yellow("%"))
+	}
+	return fmt.Sprintf("%s %s ", color.Cyan(d), color.Yellow("%"))
 }
