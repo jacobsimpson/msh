@@ -10,6 +10,7 @@ import (
 
 func ExecuteProgram(stdin io.Reader, stdout, stderr io.Writer, command *parser.Exec) {
 	cmd := exec.Command(command.Name, command.Arguments...)
+	cmd.Stdin = stdin
 	cmd.Stdout = stdout
 	cmd.Stderr = stderr
 	err := cmd.Run()
