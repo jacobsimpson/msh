@@ -2,6 +2,8 @@ package builtin
 
 import "strings"
 
+var Version string
+
 type Command interface {
 	Execute(args []string) int
 	Name() string

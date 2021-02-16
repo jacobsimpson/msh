@@ -9,6 +9,7 @@ require (
 	github.com/fatih/color v1.10.0
 	github.com/mna/pigeon v1.0.0 // indirect
 	github.com/nbutton23/zxcvbn-go v0.0.0-20201221231540-e56b841a3c88 // indirect
+	github.com/spf13/pflag v1.0.5
 	github.com/stretchr/objx v0.3.0 // indirect
 	github.com/stretchr/testify v1.3.0
 	golang.org/x/tools v0.1.0 // indirect

@@ -11,9 +11,19 @@ import (
 	"github.com/jacobsimpson/msh/builtin"
 	"github.com/jacobsimpson/msh/command"
 	"github.com/jacobsimpson/msh/parser"
+	flag "github.com/spf13/pflag"
 )
 
+var showVersion = flag.BoolP("version", "v", false, "show the version")
+
 func main() {
+	flag.Parse()
+
+	if *showVersion {
+		fmt.Printf("Version %s\n", builtin.Version)
+		os.Exit(0)
+	}
+
 	r, err := readline.New("msh> ")
 	if err != nil {
 		fmt.Fprintf(os.Stderr, "Unable to initialize newline library: %+v\n", err)

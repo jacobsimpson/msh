@@ -42,6 +42,7 @@ func printHelpSummary() int {
 	}
 	sort.Strings(names)
 
+	fmt.Printf("msh, version %s\n", Version)
 	fmt.Printf("These shell commands are defined internally. Type `help` to see this list.\n")
 	fmt.Println()
 	for _, name := range names {
