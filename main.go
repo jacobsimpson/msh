@@ -51,8 +51,8 @@ func main() {
 func evaluate(program *parser.Program) {
 	stdin, stdout, stderr := os.Stdin, os.Stdout, os.Stderr
 
-	if program.Command.Stdout != "" {
-		f, err := os.Create(program.Command.Stdout)
+	if program.Command.Redirection != nil {
+		f, err := os.Create(program.Command.Redirection.Target)
 		if err != nil {
 			fmt.Fprintf(os.Stderr, "msh: %+v", err)
 			return

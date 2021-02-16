@@ -64,8 +64,8 @@ func TestParse(t *testing.T) {
 			input: `pwd>output.txt`,
 			want: &Program{
 				Command: &Command{
-					Name:   "pwd",
-					Stdout: "output.txt",
+					Name:        "pwd",
+					Redirection: &Redirection{Truncate, "output.txt"},
 				},
 			},
 		},
@@ -73,9 +73,9 @@ func TestParse(t *testing.T) {
 			input: `echo "this is the thing"    >    output.txt`,
 			want: &Program{
 				Command: &Command{
-					Name:      "echo",
-					Arguments: []string{"this is the thing"},
-					Stdout:    "output.txt",
+					Name:        "echo",
+					Arguments:   []string{"this is the thing"},
+					Redirection: &Redirection{Truncate, "output.txt"},
 				},
 			},
 		},

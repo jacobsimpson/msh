@@ -19,9 +19,9 @@ command = name:name arguments:(_ argument)* redirection:(_ redirection)? {
         }
     }
     return &Command{
-        Name:      name.(string),
-        Arguments: result,
-        Stdout:    getStdout(redirection),
+        Name:        name.(string),
+        Arguments:   result,
+        Redirection: getRedirection(redirection),
     }, nil
 }
 
@@ -37,7 +37,10 @@ argument = argument:(double_quoted_string / single_quoted_string / word) {
 }
 
 redirection = '>' _ target:argument {
-    return target, nil
+    return &Redirection{
+        Target: target.(string),
+        Type:   Truncate,
+    }, nil
 }
 
 word = [^ \n\t\r>]+ {

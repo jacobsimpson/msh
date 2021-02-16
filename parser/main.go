@@ -5,15 +5,26 @@ type Program struct {
 }
 
 type Command struct {
-	Name      string
-	Arguments []string
-	Stdout    string
+	Name        string
+	Arguments   []string
+	Redirection *Redirection
 }
 
-func getStdout(stdout interface{}) string {
+type Type int
+
+const (
+	Truncate Type = iota
+)
+
+type Redirection struct {
+	Type   Type
+	Target string
+}
+
+func getRedirection(stdout interface{}) *Redirection {
 	if stdout == nil {
-		return ""
+		return nil
 	}
 	a := stdout.([]interface{})
-	return a[1].(string)
+	return a[1].(*Redirection)
 }
