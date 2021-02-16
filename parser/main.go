@@ -1,8 +1,10 @@
 package parser
 
 type Program struct {
-	Command *Exec
+	Command Command
 }
+
+type Command interface{}
 
 type Exec struct {
 	Name        string

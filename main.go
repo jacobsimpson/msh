@@ -51,10 +51,12 @@ func main() {
 func evaluate(program *parser.Program) {
 	stdin, stdout, stderr := os.Stdin, os.Stdout, os.Stderr
 
-	if program.Command.Redirection != nil {
-		switch program.Command.Redirection.Type {
+	cmd := program.Command.(*parser.Exec)
+
+	if cmd.Redirection != nil {
+		switch cmd.Redirection.Type {
 		case parser.Truncate:
-			f, err := os.Create(program.Command.Redirection.Target)
+			f, err := os.Create(cmd.Redirection.Target)
 			if err != nil {
 				fmt.Fprintf(os.Stderr, "msh: %+v", err)
 				return
@@ -62,7 +64,7 @@ func evaluate(program *parser.Program) {
 			stdout = f
 			defer f.Close()
 		case parser.TruncateAll:
-			f, err := os.Create(program.Command.Redirection.Target)
+			f, err := os.Create(cmd.Redirection.Target)
 			if err != nil {
 				fmt.Fprintf(os.Stderr, "msh: %+v", err)
 				return
@@ -71,7 +73,7 @@ func evaluate(program *parser.Program) {
 			stderr = f
 			defer f.Close()
 		case parser.Append:
-			f, err := os.OpenFile(program.Command.Redirection.Target, os.O_APPEND|os.O_CREATE|os.O_WRONLY, 0644)
+			f, err := os.OpenFile(cmd.Redirection.Target, os.O_APPEND|os.O_CREATE|os.O_WRONLY, 0644)
 			if err != nil {
 				fmt.Fprintf(os.Stderr, "msh: %+v", err)
 				return
@@ -81,11 +83,11 @@ func evaluate(program *parser.Program) {
 		}
 	}
 
-	if program.Command.Name == "" {
+	if cmd.Name == "" {
 		// Do nothing.
-	} else if cmd := builtin.Get(program.Command.Name); cmd != nil {
-		cmd.Execute(stdin, stdout, stderr, program.Command.Arguments)
+	} else if c := builtin.Get(cmd.Name); c != nil {
+		c.Execute(stdin, stdout, stderr, cmd.Arguments)
 	} else {
-		command.ExecuteProgram(stdin, stdout, stderr, program.Command)
+		command.ExecuteProgram(stdin, stdout, stderr, cmd)
 	}
 }
