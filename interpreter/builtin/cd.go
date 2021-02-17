@@ -21,7 +21,7 @@ func init() {
 
 type cd struct{}
 
-func (c *cd) Execute(stdin io.ReadCloser, stdout, stderr io.WriteCloser, args []string) int {
+func (c *cd) Execute(stdin io.ReadCloser, stdout, stderr io.WriteCloser, args []string) <-chan int {
 	defer stdout.Close()
 	defer stderr.Close()
 
@@ -37,7 +37,7 @@ func (c *cd) Execute(stdin io.ReadCloser, stdout, stderr io.WriteCloser, args []
 			}
 			fmt.Fprintf(stdout, "%s %s\n", color.Blue(marker), d)
 		}
-		return 1
+		return done(1)
 	} else if all(args[0], rune('-')) {
 		for i := 0; i < len(args[0]); i++ {
 			dst = directoryHistory.back()
@@ -57,12 +57,12 @@ func (c *cd) Execute(stdin io.ReadCloser, stdout, stderr io.WriteCloser, args []
 	}
 	if err := os.Chdir(dst); err != nil {
 		fmt.Fprintf(stderr, "no such file or directory: %s", dst)
-		return 1
+		return done(1)
 	}
 	if updateHistory {
 		directoryHistory.add(dst)
 	}
-	return 0
+	return done(0)
 }
 
 func (*cd) Name() string { return "cd" }

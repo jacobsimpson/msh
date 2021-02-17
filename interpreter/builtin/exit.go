@@ -9,13 +9,13 @@ import (
 
 type exit struct{}
 
-func (e *exit) Execute(stdin io.ReadCloser, stdout, stderr io.WriteCloser, args []string) int {
+func (e *exit) Execute(stdin io.ReadCloser, stdout, stderr io.WriteCloser, args []string) <-chan int {
 	defer stdout.Close()
 	defer stderr.Close()
 
 	if len(args) > 1 {
 		fmt.Fprintf(stderr, "msh: exit: too many arguments\n")
-		return 1
+		return done(1)
 	}
 	if len(args) == 1 {
 		status, err := strconv.Atoi(args[0])
@@ -26,7 +26,7 @@ func (e *exit) Execute(stdin io.ReadCloser, stdout, stderr io.WriteCloser, args 
 		os.Exit(status)
 	}
 	os.Exit(0)
-	return 0
+	return done(0)
 }
 
 func (*exit) Name() string { return "exit" }

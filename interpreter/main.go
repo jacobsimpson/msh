@@ -16,7 +16,7 @@ type stdio struct {
 	err io.WriteCloser
 }
 
-func Evaluate(program *parser.Program) {
+func Evaluate(program *parser.Program) <-chan int {
 	stdio := &stdio{
 		// For some reason, using a noopReader around Stdin doesn't work. It
 		// compiles, and runs, but in the shell, after a command exits, it
@@ -31,29 +31,30 @@ func Evaluate(program *parser.Program) {
 		out: &noopWriteCloser{os.Stdout},
 		err: &noopWriteCloser{os.Stderr},
 	}
-	evaluate(stdio, program.Command)
+	return evaluate(stdio, program.Command)
 }
 
-func evaluate(stdio *stdio, cmd parser.Command) {
+func evaluate(stdio *stdio, cmd parser.Command) <-chan int {
 	switch c := cmd.(type) {
 	case *parser.Exec:
-		evaluateExec(stdio, c)
+		return evaluateExec(stdio, c)
 	case *parser.Redirection:
-		evaluateRedirection(stdio, c)
+		return evaluateRedirection(stdio, c)
 	}
+	return done(1)
 }
 
-func evaluateExec(stdio *stdio, cmd *parser.Exec) {
+func evaluateExec(stdio *stdio, cmd *parser.Exec) <-chan int {
 	if cmd.Name == "" {
 		// Do nothing.
+		return done(0)
 	} else if c := builtin.Get(cmd.Name); c != nil {
-		c.Execute(stdio.in, stdio.out, stdio.err, cmd.Arguments)
-	} else {
-		command.ExecuteProgram(stdio.in, stdio.out, stdio.err, cmd)
+		return c.Execute(stdio.in, stdio.out, stdio.err, cmd.Arguments)
 	}
+	return command.ExecuteProgram(stdio.in, stdio.out, stdio.err, cmd)
 }
 
-func evaluateRedirection(stdio *stdio, cmd *parser.Redirection) {
+func evaluateRedirection(stdio *stdio, cmd *parser.Redirection) <-chan int {
 	switch cmd.Type {
 	case parser.Truncate:
 		// This file will be closed by the execution process, when that process
@@ -62,7 +63,7 @@ func evaluateRedirection(stdio *stdio, cmd *parser.Redirection) {
 		f, err := os.Create(cmd.Target)
 		if err != nil {
 			fmt.Fprintf(stdio.err, "msh: %+v", err)
-			return
+			return done(1)
 		}
 		stdio.out = f
 	case parser.TruncateAll:
@@ -72,7 +73,7 @@ func evaluateRedirection(stdio *stdio, cmd *parser.Redirection) {
 		f, err := os.Create(cmd.Target)
 		if err != nil {
 			fmt.Fprintf(stdio.err, "msh: %+v", err)
-			return
+			return done(1)
 		}
 		stdio.out = f
 		stdio.err = f
@@ -83,12 +84,12 @@ func evaluateRedirection(stdio *stdio, cmd *parser.Redirection) {
 		f, err := os.OpenFile(cmd.Target, os.O_APPEND|os.O_CREATE|os.O_WRONLY, 0644)
 		if err != nil {
 			fmt.Fprintf(stdio.err, "msh: %+v", err)
-			return
+			return done(1)
 		}
 		stdio.out = f
 	}
 
-	evaluate(stdio, cmd.Command)
+	return evaluate(stdio, cmd.Command)
 }
 
 type noopReadCloser struct{ reader io.Reader }
@@ -106,3 +107,12 @@ func (w *noopWriteCloser) Write(b []byte) (int, error) {
 }
 
 func (w *noopWriteCloser) Close() error { return nil }
+
+func done(status int) <-chan int {
+	c := make(chan int)
+	go func() {
+		c <- status
+		close(c)
+	}()
+	return c
+}

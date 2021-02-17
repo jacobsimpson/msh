@@ -11,7 +11,7 @@ import (
 	"github.com/jacobsimpson/msh/parser"
 )
 
-func ExecuteProgram(stdin io.ReadCloser, stdout, stderr io.WriteCloser, command *parser.Exec) {
+func ExecuteProgram(stdin io.ReadCloser, stdout, stderr io.WriteCloser, command *parser.Exec) <-chan int {
 	// Not closing stdin here because wrapping os.Stdin in a noop close
 	// implementation causes commands to halt after execution and wait for user
 	// input.
@@ -52,4 +52,14 @@ func ExecuteProgram(stdin io.ReadCloser, stdout, stderr io.WriteCloser, command 
 	signal.Stop(signals)
 	// Close the channel so the go routine handling these knows it's time to stop.
 	close(signals)
+	return done(0)
+}
+
+func done(status int) <-chan int {
+	c := make(chan int)
+	go func() {
+		c <- status
+		close(c)
+	}()
+	return c
 }

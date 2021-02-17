@@ -8,14 +8,14 @@ import (
 
 type export struct{}
 
-func (*export) Execute(stdin io.ReadCloser, stdout, stderr io.WriteCloser, args []string) int {
+func (*export) Execute(stdin io.ReadCloser, stdout, stderr io.WriteCloser, args []string) <-chan int {
 	defer stdout.Close()
 	defer stderr.Close()
 
 	for _, e := range os.Environ() {
 		fmt.Fprintf(stdout, "%s\n", e)
 	}
-	return 0
+	return done(0)
 }
 
 func (*export) Name() string { return "export" }

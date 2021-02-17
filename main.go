@@ -46,7 +46,8 @@ func main() {
 			continue
 		}
 
-		interpreter.Evaluate(ast.(*parser.Program))
+		c := interpreter.Evaluate(ast.(*parser.Program))
+		<-c
 	}
 }
 

@@ -8,7 +8,7 @@ import (
 
 type help struct{}
 
-func (*help) Execute(stdin io.ReadCloser, stdout, stderr io.WriteCloser, args []string) int {
+func (*help) Execute(stdin io.ReadCloser, stdout, stderr io.WriteCloser, args []string) <-chan int {
 	if len(args) == 0 {
 		return printHelpSummary(stdin, stdout, stderr)
 	}
@@ -25,7 +25,7 @@ func (*help) Execute(stdin io.ReadCloser, stdout, stderr io.WriteCloser, args []
 		}
 		status = 0
 	}
-	return status
+	return done(status)
 }
 
 func (*help) Name() string { return "help" }
@@ -36,7 +36,7 @@ func (*help) LongHelp() string {
 	return "Display helpful information about builtin commands. If PATTERN is specified, gives detailed help on all commands matching PATTERN, otherwise a list of the builtins is printed."
 }
 
-func printHelpSummary(stdin io.Reader, stdout, stderr io.Writer) int {
+func printHelpSummary(stdin io.Reader, stdout, stderr io.Writer) <-chan int {
 	names := []string{}
 	for _, b := range builtins {
 		names = append(names, b.Name())
@@ -50,5 +50,5 @@ func printHelpSummary(stdin io.Reader, stdout, stderr io.Writer) int {
 		fmt.Fprintf(stdout, "%-10s %s\n", name, builtins[name].ShortHelp())
 	}
 	fmt.Fprintf(stdout, "\n")
-	return 0
+	return done(0)
 }

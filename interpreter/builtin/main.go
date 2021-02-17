@@ -8,7 +8,7 @@ import (
 var Version string
 
 type Command interface {
-	Execute(in io.ReadCloser, out, err io.WriteCloser, args []string) int
+	Execute(in io.ReadCloser, out, err io.WriteCloser, args []string) <-chan int
 	Name() string
 	ShortHelp() string
 	LongHelp() string
@@ -50,4 +50,13 @@ func wrap(content string) []string {
 		content = content[i+1:]
 	}
 	return result
+}
+
+func done(status int) <-chan int {
+	c := make(chan int)
+	go func() {
+		c <- status
+		close(c)
+	}()
+	return c
 }
