@@ -4,8 +4,10 @@ A mini Unix shell.
 
 ## Development
 
+Handy little command line that rebuilds the project on each change.
+
 ```
-fswatch -Ee "msh/msh|msh/parser/main.go|msh/coverage.out|msh/.git|msh/README.md" -or . parser | xargs -n1 -I {} ./make {}
+fswatch -Ee "$(basename `pwd`)/$(basename `pwd`)|$(basename `pwd`)/parser/grammar.go|$(basename `pwd`)/coverage.out|$(basename `pwd`)/.git|$(basename `pwd`)/README.md" -or . parser | xargs -n1 -I {} ./make {}
 ```
 
 ## Known Issues
