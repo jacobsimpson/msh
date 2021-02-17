@@ -8,7 +8,7 @@ To see the built in commands:
 
 ```
 /Users/jsimpson/src/msh % help
-msh, version
+msh, version 20210217.034931
 These shell commands are defined internally. Type `help` to see this list.
 
 cd         cd [dir]
