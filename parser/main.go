@@ -25,6 +25,11 @@ type Redirection struct {
 	Command Command
 }
 
+type Pipe struct {
+	Src Command
+	Dst Command
+}
+
 func getRedirection(stdout interface{}) *Redirection {
 	if stdout == nil {
 		return nil

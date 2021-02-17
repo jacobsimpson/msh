@@ -111,6 +111,21 @@ func TestParse(t *testing.T) {
 				},
 			},
 		},
+		{
+			input: `echo "this is the thing" | grep "this"`,
+			want: &Program{
+				Command: &Pipe{
+					&Exec{
+						Name:      "echo",
+						Arguments: []string{"this is the thing"},
+					},
+					&Exec{
+						Name:      "grep",
+						Arguments: []string{"this"},
+					},
+				},
+			},
+		},
 	}
 
 	for _, test := range tests {

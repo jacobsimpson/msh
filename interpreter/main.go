@@ -10,14 +10,14 @@ import (
 	"github.com/jacobsimpson/msh/parser"
 )
 
-type stdio struct {
+type iochannels struct {
 	in  io.ReadCloser
 	out io.WriteCloser
 	err io.WriteCloser
 }
 
 func Evaluate(program *parser.Program) <-chan int {
-	stdio := &stdio{
+	stdio := &iochannels{
 		// For some reason, using a noopReader around Stdin doesn't work. It
 		// compiles, and runs, but in the shell, after a command exits, it
 		// waits for the user to type something before ending. It is
@@ -34,17 +34,19 @@ func Evaluate(program *parser.Program) <-chan int {
 	return evaluate(stdio, program.Command)
 }
 
-func evaluate(stdio *stdio, cmd parser.Command) <-chan int {
+func evaluate(stdio *iochannels, cmd parser.Command) <-chan int {
 	switch c := cmd.(type) {
 	case *parser.Exec:
 		return evaluateExec(stdio, c)
 	case *parser.Redirection:
 		return evaluateRedirection(stdio, c)
+	case *parser.Pipe:
+		return evaluatePipe(stdio, c)
 	}
 	return done(1)
 }
 
-func evaluateExec(stdio *stdio, cmd *parser.Exec) <-chan int {
+func evaluateExec(stdio *iochannels, cmd *parser.Exec) <-chan int {
 	if cmd.Name == "" {
 		// Do nothing.
 		return done(0)
@@ -54,7 +56,7 @@ func evaluateExec(stdio *stdio, cmd *parser.Exec) <-chan int {
 	return command.ExecuteProgram(stdio.in, stdio.out, stdio.err, cmd)
 }
 
-func evaluateRedirection(stdio *stdio, cmd *parser.Redirection) <-chan int {
+func evaluateRedirection(stdio *iochannels, cmd *parser.Redirection) <-chan int {
 	switch cmd.Type {
 	case parser.Truncate:
 		// This file will be closed by the execution process, when that process
@@ -90,6 +92,25 @@ func evaluateRedirection(stdio *stdio, cmd *parser.Redirection) <-chan int {
 	}
 
 	return evaluate(stdio, cmd.Command)
+}
+
+func evaluatePipe(stdio *iochannels, cmd *parser.Pipe) <-chan int {
+	r, w := io.Pipe()
+
+	s := evaluate(&iochannels{in: stdio.in, out: w, err: stdio.err}, cmd.Src)
+	d := evaluate(&iochannels{in: r, out: stdio.out, err: stdio.err}, cmd.Dst)
+	c := make(chan int)
+	go func() {
+		c <- max(<-s, <-d)
+	}()
+	return c
+}
+
+func max(i, j int) int {
+	if i > j {
+		return i
+	}
+	return j
 }
 
 type noopReadCloser struct{ reader io.Reader }

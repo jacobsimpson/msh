@@ -7,6 +7,13 @@ program = _ EOF {
     return &Program{&Exec{}}, nil
 } / _ command:command _ EOF {
     return &Program{command.(Command)}, nil
+} / _ left:command _ '|' _ right:command _ EOF {
+    return &Program{
+        &Pipe{
+            left.(Command),
+            right.(Command),
+        },
+    }, nil
 }
 
 command = name:name arguments:(_ argument)* redirection:(_ redirection)? {
@@ -32,7 +39,7 @@ command = name:name arguments:(_ argument)* redirection:(_ redirection)? {
     return e, nil
 }
 
-name = [^ \n\t\r>&]+ {
+name = [^ \n\t\r>&|]+ {
     // Without this action, the representation of this data in the resulting
     // AST would be in the form of array of array of bytes. This single line
     // changes the result of matching this rule to a single string.
@@ -68,7 +75,7 @@ append_redirect = ">>" _ target:argument {
     }, nil
 }
 
-word = [^ \n\t\r>&]+ {
+word = [^ \n\t\r>&|]+ {
     // Without this action, the representation of this data in the resulting
     // AST would be in the form of array of array of bytes. This single line
     // changes the result of matching this rule to a single string.

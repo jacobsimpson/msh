@@ -12,12 +12,6 @@ import (
 )
 
 func ExecuteProgram(stdin io.ReadCloser, stdout, stderr io.WriteCloser, command *parser.Exec) <-chan int {
-	// Not closing stdin here because wrapping os.Stdin in a noop close
-	// implementation causes commands to halt after execution and wait for user
-	// input.
-	defer stdout.Close()
-	defer stderr.Close()
-
 	cmd := exec.Command(command.Name, command.Arguments...)
 	cmd.Stdin = stdin
 	cmd.Stdout = stdout
@@ -44,15 +38,29 @@ func ExecuteProgram(stdin io.ReadCloser, stdout, stderr io.WriteCloser, command 
 		if _, ok := err.(*exec.ExitError); !ok {
 			fmt.Fprintf(stderr, "msh: command not found: %s\n", command.Name)
 		}
+		return done(1)
 	}
 
-	cmd.Wait()
+	c := make(chan int)
+	go func() {
+		cmd.Wait()
 
-	// Stop listening for Ctrl-C signals.
-	signal.Stop(signals)
-	// Close the channel so the go routine handling these knows it's time to stop.
-	close(signals)
-	return done(0)
+		// Stop listening for Ctrl-C signals.
+		signal.Stop(signals)
+		// Close the channel so the go routine handling these knows it's time to stop.
+		close(signals)
+
+		// Not closing stdin here because wrapping os.Stdin in a noop close
+		// implementation causes commands to halt after execution and wait for user
+		// input.
+		stdout.Close()
+		stderr.Close()
+
+		c <- 0
+		close(c)
+	}()
+
+	return c
 }
 
 func done(status int) <-chan int {
