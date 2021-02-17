@@ -2,25 +2,27 @@ package builtin
 
 import (
 	"fmt"
-	"io"
 	"os"
 	"strconv"
+
+	iio "github.com/jacobsimpson/msh/interpreter/io"
 )
 
 type exit struct{}
 
-func (e *exit) Execute(stdin io.ReadCloser, stdout, stderr io.WriteCloser, args []string) <-chan int {
-	defer stdout.Close()
-	defer stderr.Close()
+func (e *exit) Execute(stdio *iio.IOChannels, args []string) <-chan int {
+	defer stdio.In.Close()
+	defer stdio.Out.Close()
+	defer stdio.Err.Close()
 
 	if len(args) > 1 {
-		fmt.Fprintf(stderr, "msh: exit: too many arguments\n")
+		fmt.Fprintf(stdio.Err.Writer, "msh: exit: too many arguments\n")
 		return done(1)
 	}
 	if len(args) == 1 {
 		status, err := strconv.Atoi(args[0])
 		if err != nil {
-			fmt.Fprintf(stderr, "msh: exit: %s: numeric argument required\n", args[0])
+			fmt.Fprintf(stdio.Err.Writer, "msh: exit: %s: numeric argument required\n", args[0])
 			os.Exit(255)
 		}
 		os.Exit(status)

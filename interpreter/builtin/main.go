@@ -1,14 +1,15 @@
 package builtin
 
 import (
-	"io"
 	"strings"
+
+	iio "github.com/jacobsimpson/msh/interpreter/io"
 )
 
 var Version string
 
 type Command interface {
-	Execute(in io.ReadCloser, out, err io.WriteCloser, args []string) <-chan int
+	Execute(stdio *iio.IOChannels, args []string) <-chan int
 	Name() string
 	ShortHelp() string
 	LongHelp() string
@@ -20,9 +21,9 @@ func init() {
 	var l = []Command{
 		&cd{},
 		&exit{},
-		&pwd{},
 		&export{},
 		&help{},
+		&pwd{},
 	}
 	for _, b := range l {
 		builtins[b.Name()] = b

@@ -2,22 +2,24 @@ package builtin
 
 import (
 	"fmt"
-	"io"
 	"os"
+
+	iio "github.com/jacobsimpson/msh/interpreter/io"
 )
 
 type pwd struct{}
 
-func (*pwd) Execute(stdin io.ReadCloser, stdout, stderr io.WriteCloser, args []string) <-chan int {
-	defer stdout.Close()
-	defer stderr.Close()
+func (*pwd) Execute(stdio *iio.IOChannels, args []string) <-chan int {
+	defer stdio.In.Close()
+	defer stdio.Out.Close()
+	defer stdio.Err.Close()
 
 	wd, err := os.Getwd()
 	if err != nil {
-		fmt.Fprintf(stderr, "Unable to get the current working directory: %+v\n", err)
+		fmt.Fprintf(stdio.Err.Writer, "Unable to get the current working directory: %+v\n", err)
 		return done(1)
 	}
-	fmt.Fprintf(stdout, "%s\n", wd)
+	fmt.Fprintf(stdio.Out.Writer, "%s\n", wd)
 	return done(0)
 }
 

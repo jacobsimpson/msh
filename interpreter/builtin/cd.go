@@ -2,11 +2,11 @@ package builtin
 
 import (
 	"fmt"
-	"io"
 	"os"
 	"path/filepath"
 
 	"github.com/jacobsimpson/msh/color"
+	iio "github.com/jacobsimpson/msh/interpreter/io"
 )
 
 var directoryHistory *history
@@ -21,9 +21,10 @@ func init() {
 
 type cd struct{}
 
-func (c *cd) Execute(stdin io.ReadCloser, stdout, stderr io.WriteCloser, args []string) <-chan int {
-	defer stdout.Close()
-	defer stderr.Close()
+func (c *cd) Execute(stdio *iio.IOChannels, args []string) <-chan int {
+	defer stdio.In.Close()
+	defer stdio.Out.Close()
+	defer stdio.Err.Close()
 
 	dst := ""
 	updateHistory := true
@@ -35,7 +36,7 @@ func (c *cd) Execute(stdin io.ReadCloser, stdout, stderr io.WriteCloser, args []
 			if i == directoryHistory.current {
 				marker = "*"
 			}
-			fmt.Fprintf(stdout, "%s %s\n", color.Blue(marker), d)
+			fmt.Fprintf(stdio.Out.Writer, "%s %s\n", color.Blue(marker), d)
 		}
 		return done(1)
 	} else if all(args[0], rune('-')) {
@@ -56,7 +57,7 @@ func (c *cd) Execute(stdin io.ReadCloser, stdout, stderr io.WriteCloser, args []
 		dst = args[0]
 	}
 	if err := os.Chdir(dst); err != nil {
-		fmt.Fprintf(stderr, "no such file or directory: %s", dst)
+		fmt.Fprintf(stdio.Err.Writer, "no such file or directory: %s", dst)
 		return done(1)
 	}
 	if updateHistory {

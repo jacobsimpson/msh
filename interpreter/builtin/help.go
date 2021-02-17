@@ -2,26 +2,31 @@ package builtin
 
 import (
 	"fmt"
-	"io"
 	"sort"
+
+	iio "github.com/jacobsimpson/msh/interpreter/io"
 )
 
 type help struct{}
 
-func (*help) Execute(stdin io.ReadCloser, stdout, stderr io.WriteCloser, args []string) <-chan int {
+func (*help) Execute(stdio *iio.IOChannels, args []string) <-chan int {
+	defer stdio.In.Close()
+	defer stdio.Out.Close()
+	defer stdio.Err.Close()
+
 	if len(args) == 0 {
-		return printHelpSummary(stdin, stdout, stderr)
+		return printHelpSummary(stdio)
 	}
 	status := 1
 	for _, arg := range args {
 		b := builtins[arg]
 		if b == nil {
-			fmt.Fprintf(stderr, "msh: help: no help topics match '%s'.\n", arg)
+			fmt.Fprintf(stdio.Err.Writer, "msh: help: no help topics match '%s'.\n", arg)
 			continue
 		}
 		fmt.Printf("%s: %s\n", arg, b.ShortHelp())
 		for _, line := range wrap(b.LongHelp()) {
-			fmt.Fprintf(stdout, "    %s\n", line)
+			fmt.Fprintf(stdio.Out.Writer, "    %s\n", line)
 		}
 		status = 0
 	}
@@ -36,19 +41,19 @@ func (*help) LongHelp() string {
 	return "Display helpful information about builtin commands. If PATTERN is specified, gives detailed help on all commands matching PATTERN, otherwise a list of the builtins is printed."
 }
 
-func printHelpSummary(stdin io.Reader, stdout, stderr io.Writer) <-chan int {
+func printHelpSummary(stdio *iio.IOChannels) <-chan int {
 	names := []string{}
 	for _, b := range builtins {
 		names = append(names, b.Name())
 	}
 	sort.Strings(names)
 
-	fmt.Fprintf(stdout, "msh, version %s\n", Version)
-	fmt.Fprintf(stdout, "These shell commands are defined internally. Type `help` to see this list.\n")
-	fmt.Fprintf(stdout, "\n")
+	fmt.Fprintf(stdio.Out.Writer, "msh, version %s\n", Version)
+	fmt.Fprintf(stdio.Out.Writer, "These shell commands are defined internally. Type `help` to see this list.\n")
+	fmt.Fprintf(stdio.Out.Writer, "\n")
 	for _, name := range names {
-		fmt.Fprintf(stdout, "%-10s %s\n", name, builtins[name].ShortHelp())
+		fmt.Fprintf(stdio.Out.Writer, "%-10s %s\n", name, builtins[name].ShortHelp())
 	}
-	fmt.Fprintf(stdout, "\n")
+	fmt.Fprintf(stdio.Out.Writer, "\n")
 	return done(0)
 }

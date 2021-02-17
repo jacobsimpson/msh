@@ -2,18 +2,20 @@ package builtin
 
 import (
 	"fmt"
-	"io"
 	"os"
+
+	iio "github.com/jacobsimpson/msh/interpreter/io"
 )
 
 type export struct{}
 
-func (*export) Execute(stdin io.ReadCloser, stdout, stderr io.WriteCloser, args []string) <-chan int {
-	defer stdout.Close()
-	defer stderr.Close()
+func (*export) Execute(stdio *iio.IOChannels, args []string) <-chan int {
+	defer stdio.In.Close()
+	defer stdio.Out.Close()
+	defer stdio.Err.Close()
 
 	for _, e := range os.Environ() {
-		fmt.Fprintf(stdout, "%s\n", e)
+		fmt.Fprintf(stdio.Out.Writer, "%s\n", e)
 	}
 	return done(0)
 }

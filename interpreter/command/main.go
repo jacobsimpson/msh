@@ -2,20 +2,20 @@ package command
 
 import (
 	"fmt"
-	"io"
 	"os"
 	"os/exec"
 	"os/signal"
 	"syscall"
 
+	iio "github.com/jacobsimpson/msh/interpreter/io"
 	"github.com/jacobsimpson/msh/parser"
 )
 
-func ExecuteProgram(stdin io.ReadCloser, stdout, stderr io.WriteCloser, command *parser.Exec) <-chan int {
+func ExecuteProgram(stdio *iio.IOChannels, command *parser.Exec) <-chan int {
 	cmd := exec.Command(command.Name, command.Arguments...)
-	cmd.Stdin = stdin
-	cmd.Stdout = stdout
-	cmd.Stderr = stderr
+	cmd.Stdin = stdio.In.Reader
+	cmd.Stdout = stdio.Out.Writer
+	cmd.Stderr = stdio.Err.Writer
 
 	// Listen for Ctrl-C.
 	signals := make(chan os.Signal)
@@ -36,7 +36,7 @@ func ExecuteProgram(stdin io.ReadCloser, stdout, stderr io.WriteCloser, command 
 	err := cmd.Start()
 	if err != nil {
 		if _, ok := err.(*exec.ExitError); !ok {
-			fmt.Fprintf(stderr, "msh: command not found: %s\n", command.Name)
+			fmt.Fprintf(stdio.Err.Writer, "msh: command not found: %s\n", command.Name)
 		}
 		return done(1)
 	}
@@ -65,11 +65,9 @@ func ExecuteProgram(stdin io.ReadCloser, stdout, stderr io.WriteCloser, command 
 		// Close the channel so the go routine handling these knows it's time to stop.
 		close(signals)
 
-		// Not closing stdin here because wrapping os.Stdin in a noop close
-		// implementation causes commands to halt after execution and wait for user
-		// input.
-		stdout.Close()
-		stderr.Close()
+		stdio.In.Close()
+		stdio.Out.Close()
+		stdio.Err.Close()
 
 		c <- status
 		close(c)
