@@ -2,6 +2,59 @@
 
 A mini Unix shell.
 
+## Examples
+
+To see the built in commands:
+
+```
+/Users/jsimpson/src/msh % help
+msh, version
+These shell commands are defined internally. Type `help` to see this list.
+
+cd         cd [dir]
+exit       exit [status]
+export     export
+help       help [pattern]
+pwd        pwd
+```
+
+Some specialty things about `cd`.
+
+```
+/Users/jsimpson/src/msh % cd
+/Users/jsimpson % cd src
+/Users/jsimpson/src % cd #
+  /Users/jsimpson/src/msh
+  /Users/jsimpson
+* src
+/Users/jsimpson/src % cd --
+/Users/jsimpson/src/msh % cd #
+* /Users/jsimpson/src/msh
+  /Users/jsimpson
+  src
+/Users/jsimpson/src/msh % cd +
+/Users/jsimpson % cd #
+  /Users/jsimpson/src/msh
+* /Users/jsimpson
+  src
+/Users/jsimpson %
+```
+
+A couple basic redirects (`>`, `>&`) and piping (`|`) work.
+
+```
+/Users/jsimpson % echo 1 > t
+/Users/jsimpson % echo 2 >> t
+/Users/jsimpson % echo 3 >> t
+/Users/jsimpson % cat t
+1
+2
+3
+/Users/jsimpson % cat t | grep 3
+3
+/Users/jsimpson %
+```
+
 ## Development
 
 Handy little command line that rebuilds the project on each change.
