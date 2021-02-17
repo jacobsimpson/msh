@@ -9,6 +9,9 @@ import (
 type export struct{}
 
 func (*export) Execute(stdin io.ReadCloser, stdout, stderr io.WriteCloser, args []string) int {
+	defer stdout.Close()
+	defer stderr.Close()
+
 	for _, e := range os.Environ() {
 		fmt.Fprintf(stdout, "%s\n", e)
 	}

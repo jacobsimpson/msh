@@ -9,6 +9,9 @@ import (
 type pwd struct{}
 
 func (*pwd) Execute(stdin io.ReadCloser, stdout, stderr io.WriteCloser, args []string) int {
+	defer stdout.Close()
+	defer stderr.Close()
+
 	wd, err := os.Getwd()
 	if err != nil {
 		fmt.Fprintf(stderr, "Unable to get the current working directory: %+v\n", err)

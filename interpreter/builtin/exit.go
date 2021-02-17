@@ -10,6 +10,9 @@ import (
 type exit struct{}
 
 func (e *exit) Execute(stdin io.ReadCloser, stdout, stderr io.WriteCloser, args []string) int {
+	defer stdout.Close()
+	defer stderr.Close()
+
 	if len(args) > 1 {
 		fmt.Fprintf(stderr, "msh: exit: too many arguments\n")
 		return 1

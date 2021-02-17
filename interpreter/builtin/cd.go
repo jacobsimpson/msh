@@ -22,6 +22,9 @@ func init() {
 type cd struct{}
 
 func (c *cd) Execute(stdin io.ReadCloser, stdout, stderr io.WriteCloser, args []string) int {
+	defer stdout.Close()
+	defer stderr.Close()
+
 	dst := ""
 	updateHistory := true
 	if len(args) == 0 || args[0] == "~" {

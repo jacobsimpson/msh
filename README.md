@@ -19,3 +19,5 @@ fswatch -Ee "msh/msh|msh/parser/main.go|msh/coverage.out|msh/.git|msh/README.md"
     behave as expected (grep doesn't detect stdin, so it doesn't hang.) If I do
     connect os.Stdin to the stdin of the subprocesses, then `ls` doesn't behave
     as expected (it makes 1 long list of files, instead of columns.)
+*   The `cd` stack sometimes contains relative directories (if you `cd` to a
+    relative directory.) Use `cd #` to see a listing of the directories.

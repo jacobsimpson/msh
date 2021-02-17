@@ -12,6 +12,12 @@ import (
 )
 
 func ExecuteProgram(stdin io.ReadCloser, stdout, stderr io.WriteCloser, command *parser.Exec) {
+	// Not closing stdin here because wrapping os.Stdin in a noop close
+	// implementation causes commands to halt after execution and wait for user
+	// input.
+	defer stdout.Close()
+	defer stderr.Close()
+
 	cmd := exec.Command(command.Name, command.Arguments...)
 	cmd.Stdin = stdin
 	cmd.Stdout = stdout

@@ -18,9 +18,18 @@ type stdio struct {
 
 func Evaluate(program *parser.Program) {
 	stdio := &stdio{
+		// For some reason, using a noopReader around Stdin doesn't work. It
+		// compiles, and runs, but in the shell, after a command exits, it
+		// waits for the user to type something before ending. It is
+		// reproducable with both the custom noopReadCloser and
+		// ioutil.NopCloser. The intended use of Closers is to allow exiting
+		// processes to close their own readers and writers, signalling to any
+		// connected processes that there is no longer someone at the other
+		// end. To start with, it should be sufficient to just close the
+		// Writers, so I won't close in, so I don't need to wrap it for now.
 		in:  os.Stdin,
-		out: os.Stdout,
-		err: os.Stderr,
+		out: &noopWriteCloser{os.Stdout},
+		err: &noopWriteCloser{os.Stderr},
 	}
 	evaluate(stdio, program.Command)
 }
@@ -47,14 +56,19 @@ func evaluateExec(stdio *stdio, cmd *parser.Exec) {
 func evaluateRedirection(stdio *stdio, cmd *parser.Redirection) {
 	switch cmd.Type {
 	case parser.Truncate:
+		// This file will be closed by the execution process, when that process
+		// completes. Processes execute async, so there is no place in the
+		// stack that is safe to close the file.
 		f, err := os.Create(cmd.Target)
 		if err != nil {
 			fmt.Fprintf(stdio.err, "msh: %+v", err)
 			return
 		}
 		stdio.out = f
-		defer f.Close()
 	case parser.TruncateAll:
+		// This file will be closed by the execution process, when that process
+		// completes. Processes execute async, so there is no place in the
+		// stack that is safe to close the file.
 		f, err := os.Create(cmd.Target)
 		if err != nil {
 			fmt.Fprintf(stdio.err, "msh: %+v", err)
@@ -62,16 +76,33 @@ func evaluateRedirection(stdio *stdio, cmd *parser.Redirection) {
 		}
 		stdio.out = f
 		stdio.err = f
-		defer f.Close()
 	case parser.Append:
+		// This file will be closed by the execution process, when that process
+		// completes. Processes execute async, so there is no place in the
+		// stack that is safe to close the file.
 		f, err := os.OpenFile(cmd.Target, os.O_APPEND|os.O_CREATE|os.O_WRONLY, 0644)
 		if err != nil {
 			fmt.Fprintf(stdio.err, "msh: %+v", err)
 			return
 		}
 		stdio.out = f
-		defer f.Close()
 	}
 
 	evaluate(stdio, cmd.Command)
 }
+
+type noopReadCloser struct{ reader io.Reader }
+
+func (r *noopReadCloser) Read(b []byte) (int, error) {
+	return r.reader.Read(b)
+}
+
+func (r *noopReadCloser) Close() error { return nil }
+
+type noopWriteCloser struct{ writer io.Writer }
+
+func (w *noopWriteCloser) Write(b []byte) (int, error) {
+	return w.writer.Write(b)
+}
+
+func (w *noopWriteCloser) Close() error { return nil }
