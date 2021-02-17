@@ -102,6 +102,7 @@ func evaluatePipe(stdio *iochannels, cmd *parser.Pipe) <-chan int {
 	c := make(chan int)
 	go func() {
 		c <- max(<-s, <-d)
+		close(c)
 	}()
 	return c
 }
