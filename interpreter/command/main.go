@@ -79,10 +79,8 @@ func ExecuteProgram(stdin io.ReadCloser, stdout, stderr io.WriteCloser, command 
 }
 
 func done(status int) <-chan int {
-	c := make(chan int)
-	go func() {
-		c <- status
-		close(c)
-	}()
+	c := make(chan int, 1)
+	c <- status
+	close(c)
 	return c
 }

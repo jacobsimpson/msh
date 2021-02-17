@@ -131,10 +131,8 @@ func (w *noopWriteCloser) Write(b []byte) (int, error) {
 func (w *noopWriteCloser) Close() error { return nil }
 
 func done(status int) <-chan int {
-	c := make(chan int)
-	go func() {
-		c <- status
-		close(c)
-	}()
+	c := make(chan int, 1)
+	c <- status
+	close(c)
 	return c
 }
